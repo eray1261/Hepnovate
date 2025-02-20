@@ -1,0 +1,34 @@
+Patient ID,Type,Condition,Date,Medication,Dosage
+P1000,Active Condition,Chronic Hepatitis B,2023-09-23,,
+P1000,Active Condition,Fatty Liver Disease,2023-04-21,,
+P1000,Current Medication,,,Furosemide,40mg daily
+P1000,Current Medication,,,Entecavir,0.5mg daily
+P1001,Active Condition,Portal Hypertension,2024-02-21,,
+P1001,Current Medication,,,Propranolol,20mg twice daily
+P1001,Current Medication,,,Ursodiol,300mg twice daily
+P1002,Active Condition,Portal Hypertension,2022-08-17,,
+P1002,Current Medication,,,Propranolol,20mg twice daily
+P1003,Active Condition,Portal Hypertension,2023-07-24,,
+P1003,Active Condition,Early Stage Cirrhosis,2023-07-29,,
+P1003,Current Medication,,,Ursodiol,300mg twice daily
+P1004,Active Condition,Liver Fibrosis,2023-06-18,,
+P1004,Active Condition,Fatty Liver Disease,2022-09-10,,
+P1004,Active Condition,Portal Hypertension,2022-08-27,,
+P1004,Current Medication,,,Propranolol,20mg twice daily
+P1004,Current Medication,,,Ursodiol,300mg twice daily
+P1005,Active Condition,Early Stage Cirrhosis,2023-10-18,,
+P1005,Active Condition,Portal Hypertension,2024-02-20,,
+P1005,Current Medication,,,Propranolol,20mg twice daily
+P1006,Active Condition,Chronic Hepatitis B,2022-09-11,,
+P1006,Current Medication,,,Furosemide,40mg daily
+P1007,Active Condition,Liver Fibrosis,2023-10-05,,
+P1007,Active Condition,Chronic Hepatitis B,2023-01-04,,
+P1007,Active Condition,Fatty Liver Disease,2022-06-07,,
+P1007,Current Medication,,,Furosemide,40mg daily
+P1008,Active Condition,Portal Hypertension,2022-10-21,,
+P1008,Active Condition,Fatty Liver Disease,2024-06-02,,
+P1008,Current Medication,,,Entecavir,0.5mg daily
+P1008,Current Medication,,,Ursodiol,300mg twice daily
+P1009,Active Condition,Early Stage Cirrhosis,2022-08-27,,
+P1009,Active Condition,Fatty Liver Disease,2024-10-04,,
+P1009,Current Medication,,,Ursodiol,300mg twice daily

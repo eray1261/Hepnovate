@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { Header } from "@/components/layout/Header"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/card"
-import { useRouter } from "next/navigation"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/card";
+import { Header } from "@/components/layout/Header";
+import { parse } from 'csv-parse';
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type Symptom = {
   name: string;
@@ -17,6 +18,7 @@ type Vitals = {
 }
 
 export default function Home() {
+  const [selectedPatientId, setSelectedPatientId] = useState('P1000'); // Set initial patient ID
   const [symptoms, setSymptoms] = useState<Symptom[]>([
     { name: "Fatigue", detected: false },
     { name: "Weight Loss", detected: false },
@@ -26,9 +28,96 @@ export default function Home() {
     { name: "Nausea", detected: false },
     { name: "Jaundice", detected: false },
     { name: "Loss of Appetite", detected: false }
-  ])
-  const [vitals, setVitals] = useState<Vitals>({})
-  const router = useRouter()
+  ]);
+  const [vitals, setVitals] = useState<Vitals>({});
+  const [labResults, setLabResults] = useState();
+  const [medicalHistory, setMedicalHistory] = useState({
+    activeConditions:[],
+    currentMedication:[],
+  });
+  const router = useRouter();
+
+  useEffect(() => {
+    const loadCSVData = async () => {
+      try {
+        // Load Lab Results
+        const labResultsResponse = await fetch('/epic_data/lab_results.csv');
+        if (!labResultsResponse.ok) {
+          throw new Error(`HTTP error! status: ${labResultsResponse.status}`);
+        }
+        const labResultsCSV = await labResultsResponse.text();
+
+        parse(labResultsCSV, {
+          columns: true,
+          skip_empty_lines: true,
+        }, (err, records) => {
+          if (err) {
+            console.error("Lab Results parsing error:", err);
+            return;
+          }
+
+          // Find the data for the selected patient
+          const selectedPatientData = records.find(patient => patient['Patient ID'] === selectedPatientId);
+
+          if (selectedPatientData) {
+            const patientLabResults = Object.entries(selectedPatientData)
+            .filter(([key]) => key!== 'Patient ID')
+            .map(([name, value]) => ({ name, value, unit: '' }));
+
+            setLabResults(patientLabResults);
+          } else {
+            console.log("Patient data not found for ID:", selectedPatientId);
+            setLabResults();
+          }
+        });
+
+        // Load and parse medical history
+        const medicalHistoryResponse = await fetch('/epic_data/medical_history.csv');
+        if (!medicalHistoryResponse.ok) {
+          throw new Error(`HTTP error! status: ${medicalHistoryResponse.status}`);
+        }
+        const medicalHistoryCSV = await medicalHistoryResponse.text();
+
+        parse(medicalHistoryCSV, {
+          columns: true,
+          skip_empty_lines: true,
+        }, (err, records) => {
+          if (err) {
+            console.error("Medical History parsing error:", err);
+            return;
+          }
+
+          const newMedicalHistory = {
+            activeConditions:[],
+            currentMedication:[],
+          };
+
+          const selectedPatientRecords = records.filter(record => record['Patient ID'] === selectedPatientId);
+
+          selectedPatientRecords.forEach(item => {
+            if (item.Type === 'Active Condition') {
+              newMedicalHistory.activeConditions.push({
+                condition: item.Condition,
+                date: item.Date,
+              });
+            } else if (item.Type === 'Current Medication') {
+              newMedicalHistory.currentMedication.push({
+                name: item.Medication,
+                dosage: item.Dosage,
+              });
+            }
+          });
+
+          setMedicalHistory(newMedicalHistory);
+        });
+
+      } catch (error) {
+        console.error("Error loading CSVs:", error);
+      }
+    };
+
+    loadCSVData();
+  }, [selectedPatientId]);
 
   return (
     <main className="h-screen bg-white flex flex-col">
@@ -121,26 +210,22 @@ export default function Home() {
                   <div>
                     <CardTitle className="text-[#80BCFF] mb-4">Recent Lab Results</CardTitle>
                     <div className="space-y-2 text-black">
-                      {[
-                        { name: 'ALT (Alanine Transaminase)', unit: 'U/L' },
-                        { name: 'AST (Aspartate Transaminase)', unit: 'U/L' },
-                        { name: 'ALP (Alkaline Phosphatase)', unit: 'U/L' },
-                        { name: 'Albumin', unit: 'g/dL' },
-                        { name: 'Total Protein', unit: 'g/dL' },
-                        { name: 'Bilirubin', unit: 'mg/dL' },
-                        { name: 'GGT', unit: 'U/L' },
-                        { name: 'LD', unit: 'U/L' },
-                        { name: 'PT', unit: 'sec' }
-                      ].map((item, index) => (
-                        <div key={index} className="flex justify-between items-center">
-                          <span className="text-sm">{item.name}</span>
-                          <input 
-                            type="text" 
-                            placeholder={item.unit}
-                            className="w-24 px-2 py-1 text-sm border rounded-md text-right bg-gray-50 text-gray-500"
-                          />
-                        </div>
-                      ))}
+                      {labResults && labResults.length > 0? ( // Check if labResults is defined and not empty
+                        labResults.map((item, index) => (
+                          <div key={index} className="flex justify-between items-center">
+                            <span className="text-sm">{item.name}</span>
+                            <input
+                              type="text"
+                              value={item.value}
+                              placeholder={item.unit}
+                              className="w-24 px-2 py-1 text-sm border rounded-md text-right bg-gray-50 text-gray-500"
+                              readOnly
+                            />
+                          </div>
+                        ))
+                      ): (
+                        <div>Loading lab results...</div>
+                      )}
                     </div>
                   </div>
 
@@ -151,11 +236,7 @@ export default function Home() {
                       {/* Active Conditions */}
                       <div className="mb-4">
                         <h4 className="text-black font-bold mb-2">Active Conditions</h4>
-                        {[
-                          { condition: 'Chronic Hepatitis B', date: '03/15/2023' },
-                          { condition: 'Portal Hypertension', date: '06/22/2023' },
-                          { condition: 'Early Stage Cirrhosis', date: '09/10/2023' }
-                        ].map((item, index) => (
+                        {medicalHistory.activeConditions.map((item, index) => (
                           <div key={index} className="bg-gray-50 mb-2 p-2 rounded">
                             <div className="text-sm font-medium text-black">{item.condition}</div>
                             <div className="text-xs text-black">Diagnosed: {item.date}</div>
@@ -166,11 +247,7 @@ export default function Home() {
                       {/* Current Medication */}
                       <div>
                         <h4 className="text-black font-bold mb-2">Current Medication</h4>
-                        {[
-                          { name: 'Entecavir', dosage: '0.5mg daily' },
-                          { name: 'Propranolol', dosage: '20mg twice daily' },
-                          { name: 'Spironolactone', dosage: '100mg daily' }
-                        ].map((item, index) => (
+                        {medicalHistory.currentMedication.map((item, index) => (
                           <div key={index} className="bg-gray-50 mb-2 p-2 rounded">
                             <div className="text-sm font-medium text-black">{item.name}</div>
                             <div className="text-xs text-black">{item.dosage}</div>
