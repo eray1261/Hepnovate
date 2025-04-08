@@ -1,7 +1,13 @@
 # Hepnovate UI Project
 
 ## What is Hepnovate?
-Hepnovate is a web application that helps people understand and manage liver health. It allows users to look at medical history, lab results, and diagnostic images.
+Hepnovate helps doctors diagnose liver diseases by combining AI with medical expertise. It works in three simple steps:
+First, it listens to patient-doctor conversations to capture symptoms and pulls in recent lab results. Doctors can review and modify the suggested diagnoses before moving forward.
+Next, doctors can explore relevant imaging scans, highlight important areas, and add notes. The system uses these annotated images along with the clinical data for deeper analysis.
+Finally, Hepnovate offers potential diagnoses with confidence scores and explains its reasoning with citations. Doctors remain in control, able to select multiple diagnoses, ask for refinements, or provide feedback to improve results.
+Once the physician confirms a diagnosis, the system automatically generates a comprehensive medical write-up following standard clinical templates, saving documentation time while ensuring thorough reporting.
+The tool doesn't replace medical judgment – it enhances it by helping physicians process complex information more efficiently.
+
 
 ## Getting Started
 
