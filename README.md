@@ -8,6 +8,7 @@ Finally, Hepnovate offers potential diagnoses with confidence scores and explain
 Once the physician confirms a diagnosis, the system automatically generates a comprehensive medical write-up following standard clinical templates, saving documentation time while ensuring thorough reporting.
 The tool doesn't replace medical judgment – it enhances it by helping physicians process complex information more efficiently.
 
+[Watch Demo Video](https://www.youtube.com/watch?v=8Gkz0i7MShA)
 
 ## Getting Started
 
